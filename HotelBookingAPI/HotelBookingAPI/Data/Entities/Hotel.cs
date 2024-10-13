@@ -9,6 +9,8 @@
         public required bool HasPool { get; set; }
         public required DateTimeOffset AddedAt { get; set; }
         public required bool IsClosed { get; set; }
-        
+
+        public List<Room> Rooms { get; set; }
+
     }
 }

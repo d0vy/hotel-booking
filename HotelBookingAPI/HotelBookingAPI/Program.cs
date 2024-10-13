@@ -16,5 +16,6 @@ builder.Services.AddFluentValidationAutoValidation(configuration =>
 var app = builder.Build();
 
 app.AddHotelEndpoints();
+app.AddRoomEndpoints();
 
 app.Run();
