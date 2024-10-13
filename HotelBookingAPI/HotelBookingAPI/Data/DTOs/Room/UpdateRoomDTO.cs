@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using HotelBookingAPI.Data.DTOs.Room;
 
 namespace HotelBookingAPI.Data.DTOs.Room
 {

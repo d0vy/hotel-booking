@@ -10,6 +10,7 @@
         public required int HotelId { get; set; }
         public Hotel Hotel { get; set; }
 
+        public List<Comment> Comments { get; set; }
 
     }
 }

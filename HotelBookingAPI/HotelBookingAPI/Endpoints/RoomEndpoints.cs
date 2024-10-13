@@ -1,5 +1,4 @@
-﻿using HotelBookingAPI.Data.DTOs.Hotel;
-using HotelBookingAPI.Data.Entities;
+﻿using HotelBookingAPI.Data.Entities;
 using HotelBookingAPI.Data;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using HotelBookingAPI.Data.Mappers;
@@ -57,7 +56,7 @@ public static class RoomEndpoints
             dbContext.Rooms.Add(room);
             await dbContext.SaveChangesAsync();
 
-            return Results.Created($"api/rooms/{room.Id}", room.ToRoomDTO());
+            return Results.Created($"/api/hotels/{hotelId}/rooms/{room.Id}", room.ToRoomDTO());
         });
 
         roomsGroup.MapPut("/rooms/{roomId}", async (UpdateRoomDTO dto, int hotelId, int roomId, HotelDbContext dbContext) =>
@@ -68,7 +67,7 @@ public static class RoomEndpoints
                 return Results.NotFound();
             }
 
-            var room = await dbContext.Rooms.FindAsync(roomId);
+            var room = await dbContext.Rooms.Where(room => room.HotelId == hotelId && room.Id == roomId).FirstOrDefaultAsync();
             if (room == null)
             {
                 return Results.NotFound();
@@ -92,7 +91,7 @@ public static class RoomEndpoints
                 return Results.NotFound();
             }
 
-            var room = await dbContext.Rooms.FindAsync(roomId);
+            var room = await dbContext.Rooms.Where(room => room.HotelId == hotelId && room.Id == roomId).FirstOrDefaultAsync();
             if (room == null)
             {
                 return Results.NotFound();

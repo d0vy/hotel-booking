@@ -1,6 +1,5 @@
 ﻿using HotelBookingAPI.Data.DTOs.Hotel;
 using HotelBookingAPI.Data.Entities;
-using System.Xml.Serialization;
 
 namespace HotelBookingAPI.Data.Mappers
 {

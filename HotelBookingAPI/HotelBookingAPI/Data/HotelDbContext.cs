@@ -9,6 +9,7 @@ namespace HotelBookingAPI.Data
 
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Room> Rooms { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public HotelDbContext(IConfiguration configuration)
         {
@@ -21,6 +22,11 @@ namespace HotelBookingAPI.Data
                 .HasMany(h => h.Rooms)
                 .WithOne(r => r.Hotel)
                 .HasForeignKey(r => r.HotelId);
+
+            modelBuilder.Entity<Room>()
+                .HasMany(r => r.Comments)
+                .WithOne(c => c.Room)
+                .HasForeignKey(c => c.RoomId);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

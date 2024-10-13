@@ -17,5 +17,6 @@ var app = builder.Build();
 
 app.AddHotelEndpoints();
 app.AddRoomEndpoints();
+app.AddCommentEndpoints();
 
 app.Run();
