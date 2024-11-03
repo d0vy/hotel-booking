@@ -1,0 +1,386 @@
+openapi: 3.0.0
+
+info:
+  title: Hotel Booking API
+  description: Hotel Booking API that contains endpoints for hotels, rooms and comments
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com/api
+
+paths:
+  /hotels:
+    get:
+      summary: Get a list of hotels
+      tags:
+        - hotel
+      operationId: getAllHotels
+      responses:
+        "200":
+          description: A list of hotels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/hotel"
+              example:
+                - id: 1
+                  name: "Seaside beach new"
+                  description: "Great seaside hotel"
+                  address: "Palangos g. 50"
+                  hasPool: true
+                  isClosed: false
+                - id: 2
+                  name: "New York old"
+                  description: "Historical hotel"
+                  address: "New York 50 St."
+                  hasPool: false
+                  isClosed: false
+    post:
+      description: "Create a hotel"
+      tags:
+        - hotel
+      operationId: createHotel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createHotel"
+            example:
+              - name: "Seaside beach new"
+                description: "Great seaside hotel"
+                address: "Palangos g. 50"
+                hasPool: true
+      responses:
+        "201":
+          $ref: "#/components/responses/singleHotel"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+
+  /hotels/{hotelId}:
+    parameters:
+      - $ref: '#/components/parameters/hotelId'
+    get:
+      summary: Get a hotel
+      tags:
+        - hotel
+      operationId: getHotel
+      responses:
+        "200":
+          $ref: "#/components/responses/singleHotel"
+        "404":
+          $ref: "#/components/responses/notFound"
+    put:
+      summary: Update a hotel
+      tags:
+        - hotel
+      operationId: updateHotel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateHotel"
+            example:
+              - name: "Beach house"
+                description: "Best seaside hotel in the world"
+                address: "Palangos g. 50"
+                hasPool: true
+                isClosed: false
+      responses:
+        "200":
+          $ref: "#/components/responses/singleHotel"
+        "400":
+          $ref: "#/components/responses/badRequest"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+    delete:
+      summary: Delete a hotel
+      tags:
+        - hotel
+      operationId: deleteHotel
+      responses:
+        "404":
+          $ref: "#/components/responses/notFound"
+        "204":
+          description: Hotel deleted
+  /hotels/{hotelId}/rooms:
+    parameters:
+      - $ref: '#/components/parameters/hotelId'
+    get:
+      summary: Get rooms for a specific hotel
+      tags:
+        - room
+      operationId: getRooms
+      responses:
+        "200":
+          description: List of rooms
+    post:
+      description: 'Add a room'
+      tags:
+        - room
+      operationId: createRoom
+      responses:
+        '201':
+          description: OK
+  /hotels/{hotelId}/rooms/{roomId}:
+    parameters:
+      - $ref: '#/components/parameters/hotelId'
+      - $ref: '#/components/parameters/roomId'
+    get:
+      summary: Get a specific room for a specific hotel
+      tags:
+        - hotel
+      operationId: getHotel
+      responses:
+        "200":
+          description: A single room
+    put:
+      summary: Update a room for a specific hotel
+      tags:
+        - room
+      operationId: updateRoom
+      responses:
+        "200":
+          description: Updated room
+    delete:
+      summary: Delete a room for a specific hotel
+      tags:
+        - room
+      operationId: deleteRoom
+      responses:
+        "204":
+          description: Room deleted
+  /hotels/{hotelId}/rooms/{roomId}/comments:
+    parameters:
+      - $ref: '#/components/parameters/hotelId'
+      - $ref: '#/components/parameters/roomId'
+    get:
+      summary: Get comments for a specific room
+      tags:
+        - comment
+      operationId: getComments
+      responses:
+        "200":
+          description: List of comments
+    post:
+      summary: Add a comment for a specific room
+      tags:
+        - comment
+      operationId: createComment
+      responses:
+        "201":
+          description: OK
+  /hotels/{hotelId}/rooms/{roomId}/comments/{commentId}:
+    parameters:
+      - $ref: '#/components/parameters/hotelId'
+      - $ref: '#/components/parameters/roomId'
+      - $ref: '#/components/parameters/commentId'
+    get:
+      summary: Get a specific comment for a specific room
+      tags:
+        - comment
+      operationId: getComment
+      responses:
+        "200":
+          description: A single comment
+    put:
+      summary: Update a comment for a specific room
+      tags:
+        - comment
+      operationId: updateComment
+      responses:
+        "200":
+          description: Updated comment
+    delete:
+      summary: Delete a comment for a specific room
+      tags:
+        - comment
+      operationId: deleteComment
+      responses:
+        "204":
+          description: Comment deleted
+components:
+  schemas:
+    hotel:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          minLength: 2
+          maxLength: 100
+          type: string
+        description:
+          minLength: 5
+          maxLength: 500
+          type: string
+        address:
+          minLength: 5
+          maxLength: 500
+          type: string
+        hasPool:
+          type: boolean
+        addedAt:
+          type: string
+          format: date-time
+        isClosed:
+          type: boolean
+    createHotel:
+      type: object
+      required:
+        - name
+        - description
+        - address
+        - hasPool
+      properties:
+        name:
+          minLength: 2
+          maxLength: 100
+          type: string
+        description:
+          minLength: 5
+          maxLength: 500
+          type: string
+        address:
+          minLength: 5
+          maxLength: 500
+          type: string
+        hasPool:
+          type: boolean
+    updateHotel:
+      type: object
+      properties:
+        name:
+          minLength: 2
+          maxLength: 100
+          type: string
+        description:
+          minLength: 5
+          maxLength: 500
+          type: string
+        address:
+          minLength: 5
+          maxLength: 500
+          type: string
+        hasPool:
+          type: boolean
+        isClosed:
+          type: boolean
+    room:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: integer
+        bedAmount:
+          type: integer
+        description:
+          type: string
+    comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    problemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: A URI reference that identifies the problem type.
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type.
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code applicable to this problem.
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem.
+        instance:
+          type: string
+          format: uri
+          description: A URI reference that identifies the specific occurrence of the problem.
+        errors:
+          type: object
+          description: A map of detailed errors for every property ([property => error])
+  responses:
+    singleHotel:
+      description: A hotel
+      content:
+        application/json:
+          schema:
+            type: object
+            items:
+              $ref: "#/components/schemas/hotel"
+          example:
+            - id: 1
+              name: "Seaside beach new"
+              description: "Discussion about best practices when using OpenAPI"
+              address: "Palangos g. 50"
+              hasPool: false
+              isClosed: false
+    unprocessableEntity:
+      description: Unprocessable entity response
+      content:
+        application/problem+json:
+          schema:
+            type: object
+            items:
+              $ref: "#/components/schemas/problemDetails"
+          example:
+            type: "https://tools.ietf.org/html/rfc4918#section-11.2"
+            title: "Unprocessable Entity"
+            status: 422
+            errors:
+              Name:
+                - "'Description' must not be empty."
+    badRequest:
+      description: Bad request response
+    notFound:
+      description: Resource was not found
+  parameters:
+    hotelId:
+      name: hotelId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: The unique identifier of the hotel
+    roomId:
+      name: roomId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: The unique identifier of the room
+    commentId:
+      name: commentId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: The unique identifier of the comment
+  
+tags:
+  - name: hotel
+    description: Operations related to hotels
+  - name: room
+    description: Operations related to rooms
+  - name: comment
+    description: Operations related to comments
