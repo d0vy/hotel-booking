@@ -68,6 +68,7 @@ public static class CommentEndpoints
                 Text = dto.Text,
                 CreatedAt = DateTimeOffset.UtcNow,
                 RoomId = roomId,
+                UserId = ""
             };
 
             dbContext.Comments.Add(comment);

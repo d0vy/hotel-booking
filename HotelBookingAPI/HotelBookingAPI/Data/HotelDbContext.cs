@@ -1,9 +1,11 @@
-﻿using HotelBookingAPI.Data.Entities;
+﻿using HotelBookingAPI.Auth.Model;
+using HotelBookingAPI.Data.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBookingAPI.Data
 {
-    public class HotelDbContext : DbContext
+    public class HotelDbContext : IdentityDbContext<HotelUser>
     {
         private readonly IConfiguration _configuration;
 
@@ -18,6 +20,8 @@ namespace HotelBookingAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Hotel>()
                 .HasMany(h => h.Rooms)
                 .WithOne(r => r.Hotel)
