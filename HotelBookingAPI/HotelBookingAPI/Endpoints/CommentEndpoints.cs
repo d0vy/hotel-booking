@@ -4,6 +4,11 @@ using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using Microsoft.EntityFrameworkCore;
 using HotelBookingAPI.Data.Mappers;
 using HotelBookingAPI.Data.DTOs.Comment;
+using Microsoft.AspNetCore.Authorization;
+using HotelBookingAPI.Auth.Model;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace HotelBookingAPI.Endpoints;
 
@@ -49,7 +54,7 @@ public static class CommentEndpoints
             return comments == null ? Results.NotFound() : Results.Ok(comments.ToCommentDTO());
         });
 
-        roomsGroup.MapPost("/comments", async (int hotelId, int roomId, CreateCommentDTO dto, HotelDbContext dbContext) =>
+        roomsGroup.MapPost("/comments", [Authorize(Roles = HotelRoles.HotelUser)] async (int hotelId, int roomId, CreateCommentDTO dto, HotelDbContext dbContext, HttpContext httpContext) =>
         {
             var hotel = await dbContext.Hotels.FindAsync(hotelId);
             if (hotel == null)
@@ -68,7 +73,7 @@ public static class CommentEndpoints
                 Text = dto.Text,
                 CreatedAt = DateTimeOffset.UtcNow,
                 RoomId = roomId,
-                UserId = ""
+                UserId = httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub)
             };
 
             dbContext.Comments.Add(comment);
@@ -77,7 +82,7 @@ public static class CommentEndpoints
             return Results.Created($"/api/hotels/{hotelId}/rooms/{roomId}/comments/{comment.Id}", comment.ToCommentDTO());
         });
 
-        roomsGroup.MapPut("/comments/{commentId}", async (UpdateCommentDTO dto, int hotelId, int roomId, int commentId, HotelDbContext dbContext) =>
+        roomsGroup.MapPut("/comments/{commentId}", [Authorize] async (UpdateCommentDTO dto, int hotelId, int roomId, int commentId, HotelDbContext dbContext, HttpContext httpContext) =>
         {
             var hotel = await dbContext.Hotels.FindAsync(hotelId);
             if (hotel == null)
@@ -95,6 +100,11 @@ public static class CommentEndpoints
             if (comment == null)
             {
                 return Results.NotFound();
+            }
+
+            if(!httpContext.User.IsInRole(HotelRoles.Admin) && httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != comment.UserId)
+            {
+                return Results.Forbid();
             }
 
             comment.Text = dto.Text;
@@ -105,7 +115,7 @@ public static class CommentEndpoints
             return Results.Ok(comment.ToCommentDTO());
         });
 
-        roomsGroup.MapDelete("/comments/{commentId}", async (int hotelId, int roomId, int commentId, HotelDbContext dbContext) =>
+        roomsGroup.MapDelete("/comments/{commentId}", [Authorize] async (int hotelId, int roomId, int commentId, HotelDbContext dbContext, HttpContext httpContext) =>
         {
             var hotel = await dbContext.Hotels.FindAsync(hotelId);
             if (hotel == null)
@@ -123,6 +133,11 @@ public static class CommentEndpoints
             if (comment == null)
             {
                 return Results.NotFound();
+            }
+
+            if (!httpContext.User.IsInRole(HotelRoles.Admin) && httpContext.User.FindFirstValue(JwtRegisteredClaimNames.Sub) != comment.UserId)
+            {
+                return Results.Forbid();
             }
 
             dbContext.Comments.Remove(comment);

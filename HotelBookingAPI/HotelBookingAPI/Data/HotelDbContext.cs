@@ -12,6 +12,7 @@ namespace HotelBookingAPI.Data
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Session> Sessions { get; set; }
 
         public HotelDbContext(IConfiguration configuration)
         {

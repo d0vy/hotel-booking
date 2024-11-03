@@ -21,6 +21,7 @@ builder.Services.AddFluentValidationAutoValidation(configuration =>
 });
 
 builder.Services.AddTransient<JwtTokenService>();
+builder.Services.AddTransient<SessionService>();
 builder.Services.AddScoped<AuthSeeder>();
 
 builder.Services.AddIdentity<HotelUser, IdentityRole>()

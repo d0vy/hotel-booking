@@ -4,6 +4,8 @@ using HotelBookingAPI.Data.Mappers;
 using HotelBookingAPI.Data.Entities;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using Microsoft.EntityFrameworkCore;
+using HotelBookingAPI.Auth.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelBookingAPI.Endpoints;
 
@@ -24,7 +26,7 @@ public static class HotelEndpoints
             return hotel == null ? Results.NotFound() : Results.Ok(hotel.ToHotelDTO());
         });
 
-        hotelsGroup.MapPost("/hotels", async (CreateHotelDTO dto, HotelDbContext dbContext) =>
+        hotelsGroup.MapPost("/hotels", [Authorize(Roles = HotelRoles.Admin)] async (CreateHotelDTO dto, HotelDbContext dbContext) =>
         {
             var hotel = new Hotel
             {
@@ -42,7 +44,7 @@ public static class HotelEndpoints
             return Results.Created($"api/hotels/{hotel.Id}", hotel.ToHotelDTO());
         });
 
-        hotelsGroup.MapPut("/hotels/{hotelId}", async (UpdateHotelDTO dto, int hotelId, HotelDbContext dbContext) =>
+        hotelsGroup.MapPut("/hotels/{hotelId}", [Authorize(Roles = HotelRoles.Admin)] async (UpdateHotelDTO dto, int hotelId, HotelDbContext dbContext) =>
         {
             var hotel = await dbContext.Hotels.FindAsync(hotelId);
             if (hotel == null)
@@ -62,7 +64,7 @@ public static class HotelEndpoints
             return Results.Ok(hotel.ToHotelDTO());
         });
 
-        hotelsGroup.MapDelete("/hotels/{hotelId}", async (int hotelId, HotelDbContext dbContext) =>
+        hotelsGroup.MapDelete("/hotels/{hotelId}", [Authorize(Roles = HotelRoles.Admin)] async (int hotelId, HotelDbContext dbContext) =>
         {
             var hotel = await dbContext.Hotels.FindAsync(hotelId);
             if (hotel == null)

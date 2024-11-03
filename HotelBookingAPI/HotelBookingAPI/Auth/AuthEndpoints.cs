@@ -37,7 +37,7 @@ namespace HotelBookingAPI.Auth
                 return Results.Created();
             });
 
-            app.MapPost("api/login", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, HttpContext httpContext,LoginDTO dto) =>
+            app.MapPost("api/login", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext,LoginDTO dto) =>
             {
                 var user = await userManager.FindByNameAsync(dto.UserName);
                 if (user == null)
@@ -53,9 +53,12 @@ namespace HotelBookingAPI.Auth
 
                 var roles = await userManager.GetRolesAsync(user);
 
+                var sessionId = Guid.NewGuid();
                 var expiresAt = DateTime.UtcNow.AddDays(3);
                 var accessToken = jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
-                var refreshToken = jwtTokenService.CreatRefreshToken(user.Id, expiresAt);
+                var refreshToken = jwtTokenService.CreatRefreshToken(sessionId, user.Id, expiresAt);
+
+                await sessionService.CreateSessionAsync(sessionId, user.Id, refreshToken, expiresAt);
 
                 var cookieOptions = new CookieOptions
                 {
@@ -69,7 +72,7 @@ namespace HotelBookingAPI.Auth
                 return Results.Ok(new SuccessfulLoginDTO(accessToken));
             });
 
-            app.MapPost("api/accessToken", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, HttpContext httpContext) =>
+            app.MapPost("api/accessToken", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext) =>
             {
                 if(!httpContext.Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
                 {
@@ -77,6 +80,18 @@ namespace HotelBookingAPI.Auth
                 }
 
                 if(!jwtTokenService.TryParseRefreshToken(refreshToken, out var claims))
+                {
+                    return Results.UnprocessableEntity();
+                }
+
+                var sessionId = claims.FindFirstValue("SessionId");
+                if(string.IsNullOrEmpty(sessionId))
+                {
+                    return Results.UnprocessableEntity();
+                }
+
+                var sessionIdAsGuid = Guid.Parse(sessionId);
+                if(!await sessionService.IsSessionValidAsync(sessionIdAsGuid, refreshToken))
                 {
                     return Results.UnprocessableEntity();
                 }
@@ -92,7 +107,7 @@ namespace HotelBookingAPI.Auth
 
                 var expiresAt = DateTime.UtcNow.AddDays(3);
                 var accessToken = jwtTokenService.CreateAccessToken(user.UserName, user.Id, roles);
-                var newRefreshToken = jwtTokenService.CreatRefreshToken(user.Id, expiresAt);
+                var newRefreshToken = jwtTokenService.CreatRefreshToken(sessionIdAsGuid, user.Id, expiresAt);
 
                 var cookieOptions = new CookieOptions
                 {
@@ -101,9 +116,35 @@ namespace HotelBookingAPI.Auth
                     Expires = expiresAt,
                 };
 
-                httpContext.Response.Cookies.Append("RefreshToken", refreshToken, cookieOptions);
+                httpContext.Response.Cookies.Append("RefreshToken", newRefreshToken, cookieOptions);
+
+                await sessionService.ExtendSessionAsync(sessionIdAsGuid, newRefreshToken, expiresAt);
 
                 return Results.Ok(new SuccessfulLoginDTO(accessToken));
+            });
+
+            app.MapPost("api/logout", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext) =>
+            {
+                if (!httpContext.Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
+                {
+                    return Results.UnprocessableEntity();
+                }
+
+                if (!jwtTokenService.TryParseRefreshToken(refreshToken, out var claims))
+                {
+                    return Results.UnprocessableEntity();
+                }
+
+                var sessionId = claims.FindFirstValue("SessionId");
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    return Results.UnprocessableEntity();
+                }
+
+                await sessionService.InvalidateSessionAsync(Guid.Parse(sessionId));
+                httpContext.Response.Cookies.Delete("RefreshToken");
+
+                return Results.Ok();
             });
         }
     }
