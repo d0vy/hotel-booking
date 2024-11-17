@@ -76,6 +76,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     logout();
     setToken(null);
     setCurrentUser(null);
+    axiosInstance.defaults.headers.common["Authorization"] = "";
     navigate("/");
     toast.success("Log Out Successful");
   }

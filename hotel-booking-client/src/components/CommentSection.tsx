@@ -1,15 +1,95 @@
-import { deleteComment, getComments } from "../api/hotelApi";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+} from "../api/hotelApi";
 import LoadingSpinner from "./LoadingSpinner";
 import CommentCard from "./CommentCard";
-import { useState } from "react";
-import { login } from "../api/auth/authApi";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { CreateComment } from "../modules/types";
+import { useAuth } from "./AuthProvider";
+
+const commentSchema = z.object({
+  text: z
+    .string()
+    .min(2, "Comment must be at least 2 characters long")
+    .max(100, "Comment cannot be more than 100 characters long"),
+});
 
 type Props = { hotelId: string; roomId: string };
 
 const CommentSection = ({ hotelId, roomId }: Props) => {
   const [editingIndex, setEditingIndex] = useState<null | number>(null);
   const [editedComment, setEditedComment] = useState("");
+  const { currentUser } = useAuth();
+
+  const queryClient = useQueryClient();
+
+  const { data: comments, isLoading } = useQuery({
+    queryKey: ["comments", { hotelId, roomId }],
+    queryFn: () => getComments(hotelId, roomId),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(commentSchema),
+  });
+
+  const mutationCreateComment = useMutation({
+    mutationFn: (commentText: CreateComment) =>
+      createComment(hotelId, roomId, commentText),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", { hotelId, roomId }],
+      });
+      reset();
+      toast.success("Comment added successfully!");
+    },
+    onError: () => {
+      toast.error("Error creating comment.");
+    },
+  });
+
+  const mutationUpdateComment = useMutation({
+    mutationFn: (updatedComment: { commentId: string; text: string }) =>
+      updateComment(hotelId, roomId, updatedComment.commentId, {
+        text: updatedComment.text,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", { hotelId, roomId }],
+      });
+      setEditingIndex(null);
+      toast.success("Comment updated successfully!");
+    },
+    onError: () => {
+      toast.error("Error updating comment.");
+    },
+  });
+
+  const mutationDeleteComment = useMutation({
+    mutationFn: (commentId: string) =>
+      deleteComment(hotelId, roomId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", { hotelId, roomId }],
+      });
+      toast.success("Comment deleted successfully!");
+    },
+    onError: () => {
+      toast.error("Error deleting comment.");
+    },
+  });
 
   const handleEdit = (index: number) => {
     setEditingIndex(index);
@@ -17,19 +97,25 @@ const CommentSection = ({ hotelId, roomId }: Props) => {
   };
 
   const handleSave = async () => {
-    setEditingIndex(null);
+    if (editedComment.length < 2) {
+      toast.error("Comment must be at least 2 characters long.");
+      return;
+    }
+
+    const commentId = comments![editingIndex!].id;
+
+    mutationUpdateComment.mutate({ commentId, text: editedComment });
+
     setEditedComment("");
   };
 
   const handleDelete = (commentId: string) => {
-    const res = deleteComment(hotelId, roomId, commentId);
-    console.log(res);
+    mutationDeleteComment.mutate(commentId);
   };
 
-  const { data: comments, isLoading } = useQuery({
-    queryKey: ["comments", { hotelId, roomId }],
-    queryFn: () => getComments(hotelId, roomId),
-  });
+  const onSubmit = (data: { text: string }) => {
+    mutationCreateComment.mutate({ text: data.text });
+  };
 
   if (isLoading) {
     return (
@@ -43,6 +129,30 @@ const CommentSection = ({ hotelId, roomId }: Props) => {
     <div>
       <hr className="my-8 border-t-4 border-orange-500" />
       <h2 className="text-2xl font-semibold text-center mb-6">Comments</h2>
+
+      {currentUser && (
+        <div className="bg-white p-4 rounded-lg shadow-md mb-4">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <textarea
+              {...register("text")}
+              className="w-full p-2 border border-gray-300 rounded mb-4 min-h-20"
+              placeholder="Add a new comment..."
+            />
+            {errors.text && (
+              <p className="text-red-500 text-sm">{errors.text.message}</p>
+            )}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="py-3 px-6 mr-5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-300"
+              >
+                Add Comment
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {editingIndex !== null ? (
         <div className="bg-white p-4 rounded-lg shadow-md mb-4">
           <textarea
@@ -53,13 +163,13 @@ const CommentSection = ({ hotelId, roomId }: Props) => {
           <div className="flex justify-end">
             <button
               onClick={handleSave}
-              className="bg-green-500 text-white px-4 py-2 rounded mr-2 hover:bg-green-400"
+              className="py-3 px-6 mr-5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-300"
             >
               Save
             </button>
             <button
-              onClick={() => setEditingIndex(null)} // Cancel editing
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-400"
+              onClick={() => setEditingIndex(null)}
+              className="text-orange-600 hover:text-orange-800"
             >
               Cancel
             </button>

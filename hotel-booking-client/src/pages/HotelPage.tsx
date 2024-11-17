@@ -59,7 +59,7 @@ const HotelPage = () => {
 
   return (
     <div className="container mx-auto py-12">
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col">
         {isAdmin && !isEditMode && (
           <div className="flex justify-end mt-4 space-x-4">
             <button
@@ -81,7 +81,7 @@ const HotelPage = () => {
       {isEditMode ? (
         <HotelForm hotel={hotel} onClose={() => setIsEditMode(false)} />
       ) : (
-        <div className="container mx-auto py-12">
+        <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-4xl font-bold text-orange-600">
@@ -96,14 +96,14 @@ const HotelPage = () => {
           </div>
           {isAdmin && (
             <div className="flex justify-end mt-4 relative">
-        <Link
-          to={`/hotel/${hotelId}/room`}
-          className="absolute top-10 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition duration-300"
-        >
-          <span className="text-2xl">+</span>
-        </Link>
-        </div>
-      )}
+              <Link
+                to={`/hotel/${hotelId}/room`}
+                className="absolute top-10 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition duration-300"
+              >
+                <span className="text-2xl">+</span>
+              </Link>
+            </div>
+          )}
           <RoomSection hotelId={hotelId} />
         </div>
       )}

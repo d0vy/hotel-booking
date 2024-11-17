@@ -8,6 +8,7 @@ import { useAuth } from "../components/AuthProvider";
 import { toast } from "react-toastify";
 import RoomForm from "../components/RoomForm";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const RoomPage = () => {
   const { hotelId, roomId } = useParams();
@@ -64,28 +65,37 @@ const RoomPage = () => {
   return (
     <div className="container mx-auto py-12">
       <div className="flex flex-col space-y-4">
-        {isAdmin && !isEditMode && (
-          <div className="flex justify-end mt-4 space-x-4">
-            <button
-              className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-              onClick={() => setIsEditMode(true)}
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-            >
-              Delete
-            </button>
-          </div>
-        )}
+        <div className="flex justify-between items-center">
+          <Link
+            to={`/hotel/${hotelId}`}
+            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+          >
+            Go back to hotel page
+          </Link>
+
+          {isAdmin && !isEditMode && (
+            <div className="flex space-x-4 ml-auto">
+              <button
+                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                onClick={() => setIsEditMode(true)}
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {isEditMode ? (
         <RoomForm room={room} onClose={() => setIsEditMode(false)} />
       ) : (
-        <div className="container mx-auto py-12">
+        <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-4xl font-bold text-orange-600">
