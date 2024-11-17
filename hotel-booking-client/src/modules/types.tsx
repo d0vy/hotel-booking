@@ -21,11 +21,21 @@ export type Room = {
   description: string;
 };
 
+export type CreateRoom = {
+  number: number;
+  bedAmount: number;
+  description: string;
+};
+
 export type Comment = {
   id: string;
   text: string;
   createdAt: Date;
   userName: string;
+};
+
+export type CreateComment = {
+  text: string;
 };
 
 export type LoginUser = {

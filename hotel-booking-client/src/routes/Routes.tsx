@@ -8,6 +8,7 @@ import LoginPage from "../pages/LoginPage";
 import CreateHotelPage from "../pages/CreateHotelPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProtectedRoute from "../components/ProtectedRoute";
+import CreateRoomPage from "../pages/CreateRoomPage";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,14 @@ export const router = createBrowserRouter([
       {
         path: "hotel/:hotelId/room/:roomId",
         element: <RoomPage />,
+      },
+      {
+        path: "hotel/:hotelId/room",
+        element: (
+          <ProtectedRoute allowedRoles={["Admin"]}>
+            <CreateRoomPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "*",

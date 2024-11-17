@@ -1,9 +1,7 @@
-import React from 'react'
 import HotelForm from '../components/HotelForm';
 
-type Props = {}
 
-const CreateHotelPage = (props: Props) => {
+const CreateHotelPage = () => {
   return (
     <HotelForm/>
   )

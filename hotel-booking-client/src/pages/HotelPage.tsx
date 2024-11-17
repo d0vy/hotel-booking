@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { deleteHotel, getHotel } from "../api/hotelApi";
 import NotFoundPage from "./NotFoundPage";
@@ -94,6 +94,16 @@ const HotelPage = () => {
               </p>
             </div>
           </div>
+          {isAdmin && (
+            <div className="flex justify-end mt-4 relative">
+        <Link
+          to={`/hotel/${hotelId}/room`}
+          className="absolute top-10 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition duration-300"
+        >
+          <span className="text-2xl">+</span>
+        </Link>
+        </div>
+      )}
           <RoomSection hotelId={hotelId} />
         </div>
       )}

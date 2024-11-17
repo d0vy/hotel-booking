@@ -1,5 +1,12 @@
 import axios from "axios";
-import { Hotel, Room, Comment, CreateHotel } from "../modules/types";
+import {
+  Hotel,
+  Room,
+  Comment,
+  CreateHotel,
+  CreateRoom,
+  CreateComment,
+} from "../modules/types";
 import { axiosInstance } from "./axios";
 
 const APIHotelEndpoint = "/hotels";
@@ -120,6 +127,63 @@ export const getRoom = async (hotelId: string, roomId: string) => {
   }
 };
 
+export const createRoom = async (hotelId: string, room: CreateRoom) => {
+  try {
+    const response = await axiosInstance.post(
+      APIHotelEndpoint + `/${hotelId}` + APIRoomEndpoint,
+      room
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.response?.data);
+      return error.response?.data;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const updateRoom = async (
+  hotelId: string,
+  roomId: string,
+  room: CreateRoom
+) => {
+  try {
+    const response = await axiosInstance.put(
+      APIHotelEndpoint + `/${hotelId}` + APIRoomEndpoint + `/${roomId}`,
+      room
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const deleteRoom = async (hotelId: string, roomId: string) => {
+  try {
+    await axiosInstance.delete(
+      APIHotelEndpoint + `/${hotelId}` + APIRoomEndpoint + `/${roomId}`
+    );
+    return "success";
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
 const APICommentEndpoint = "/comments";
 
 export const getComments = async (hotelId: string, roomId: string) => {
@@ -130,6 +194,60 @@ export const getComments = async (hotelId: string, roomId: string) => {
         APIRoomEndpoint +
         `/${roomId}` +
         APICommentEndpoint
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const createComment = async (
+  hotelId: string,
+  roomId: string,
+  comment: CreateComment
+) => {
+  try {
+    const response = await axiosInstance.post(
+      APIHotelEndpoint +
+        `/${hotelId}` +
+        APIRoomEndpoint +
+        `/${roomId}` +
+        APICommentEndpoint,
+      comment
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const updateComment = async (
+  hotelId: string,
+  roomId: string,
+  commentId: string,
+  comment: CreateComment
+) => {
+  try {
+    const response = await axiosInstance.put(
+      APIHotelEndpoint +
+        `/${hotelId}` +
+        APIRoomEndpoint +
+        `/${roomId}` +
+        APICommentEndpoint +
+        `/${commentId}`,
+      comment
     );
     return response.data;
   } catch (error) {

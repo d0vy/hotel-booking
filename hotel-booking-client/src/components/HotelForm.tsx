@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createHotel, updateHotel } from "../api/hotelApi";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const hotelSchema = z.object({
   name: z
@@ -216,14 +216,22 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
           </div>
         </form>
 
-        <div className="mt-4 text-center">
-          <button
-            onClick={onClose}
-            className="text-orange-600 hover:text-orange-800"
-          >
-            Cancel
-          </button>
-        </div>
+        {hotel ? (
+          <div className="mt-4 text-center">
+            <button
+              onClick={onClose}
+              className="text-orange-600 hover:text-orange-800"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div className="mt-4 text-center">
+            <Link to={`/`} className="text-orange-600 hover:text-orange-800">
+              Go back
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

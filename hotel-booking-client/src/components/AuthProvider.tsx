@@ -78,7 +78,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setCurrentUser(null);
     navigate("/");
     toast.success("Log Out Successful");
-    console.log("remove user");
   }
 
   useEffect(() => {
