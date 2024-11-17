@@ -63,7 +63,7 @@ const RoomPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
+    <div className="container mx-auto py-12 mt-10 mx-5">
       <div className="flex flex-col space-y-4">
         <div className="flex justify-between items-center">
           <Link
@@ -95,7 +95,7 @@ const RoomPage = () => {
       {isEditMode ? (
         <RoomForm room={room} onClose={() => setIsEditMode(false)} />
       ) : (
-        <div className="container mx-auto">
+        <div className="container mx-auto mt-10">
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-4xl font-bold text-orange-600">

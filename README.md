@@ -1,13 +1,11 @@
 # Hotel Booking project for university T120B165 module
-The purpose of this system is to let users look through, book available hotel rooms, and write comments about those booked rooms.
+The purpose of this system is to let users look through and see information about hotels, their rooms and comments about those rooms.
 
 ### Functional requirements
 * Registration/login with authorization using JWT (guest)
 * Look through hotels, rooms, and comments (guest, user, admin)
-* Book/unbook hotel rooms and look through the booked hotel room list (user)
 * Add, edit, and delete hotels, rooms (admin)
-* Add, edit, and delete comments on hotel rooms (user, admin)
-* Same hotel room can't be booked twice if booking periods overlap
+* Add, edit, and delete comments on hotel rooms, which belong to user. Admin can edit, delete all commentss (user, admin)
 
 ### Technologies:
 #### Frontend

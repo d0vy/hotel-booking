@@ -25,11 +25,17 @@ const hotelSchema = z.object({
   }),
   image: z
     .instanceof(FileList, { message: "Please upload a valid file" })
-    .refine((file) => file[0].size <= 2000000, "Max image size is 2MB.")
     .refine(
-      (file) => ["image/png", "image/jpeg", "image/jpg"].includes(file[0].type),
+      (file) => !file.length || file[0].size <= 2000000,
+      "Max image size is 2MB."
+    )
+    .refine(
+      (file) =>
+        !file.length ||
+        ["image/png", "image/jpeg", "image/jpg"].includes(file[0].type),
       "Only .jpg, .jpeg, and .png formats are supported."
-    ),
+    )
+    .optional(),
 });
 
 type HotelInputs = z.infer<typeof hotelSchema>;
@@ -64,7 +70,7 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
           description: hotel.description,
           address: hotel.address,
           hasPool: hotel.hasPool ? "true" : "false",
-          image: null
+          image: null,
         }
       : {
           name: "",
@@ -84,8 +90,6 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
     }
   }, [hotel, setValue]);
 
-  const imageFile = watch("image");
-
   const onSubmit = async (data: HotelInputs) => {
     const formData = new FormData();
     formData.append("name", data.name);
@@ -94,10 +98,8 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
     formData.append("hasPool", data.hasPool);
     formData.append("isClosed", "false");
 
-    if (imageFile) {
-      if (data.image[0]) {
-        formData.append("image", data.image[0]);
-      }
+    if (data.image[0]) {
+      formData.append("image", data.image[0]);
 
       if (hotel) {
         const response = await updateHotel(hotel.id, formData);
@@ -120,6 +122,7 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
       }
     } else {
       if (hotel) {
+        formData.append("image", "");
         const response = await updateHotel(hotel.id, formData);
         if (!response) {
           toast.error("Hotel Update Failed");
@@ -129,7 +132,7 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
           onClose();
         }
       } else {
-        setError("image",{message:"Please upload hotel image"})
+        setError("image", { message: "Please upload hotel image" });
         toast.error("Hotel Update Failed");
       }
     }
