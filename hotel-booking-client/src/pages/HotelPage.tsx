@@ -8,6 +8,7 @@ import { useState } from "react";
 import RoomSection from "../components/RoomSection";
 import { useAuth } from "../components/AuthProvider";
 import { toast } from "react-toastify";
+import { baseURL } from "../api/axios";
 
 const HotelPage = () => {
   const { hotelId } = useParams();
@@ -83,17 +84,27 @@ const HotelPage = () => {
       ) : (
         <div className="container mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-4xl font-bold text-orange-600">
-                {hotel?.name}
-              </h2>
-              <p className="text-lg text-gray-600 mt-4">{hotel?.description}</p>
-              <p className="text-lg text-gray-600 mt-4">{hotel?.address}</p>
-              <p className="text-lg text-gray-600 mt-4">
+            <div className="space-y-4">
+              <h2 className="text-4xl font-bold text-orange-600">{hotel?.name}</h2>
+              <div className="relative w-full h-64 bg-gray-200 rounded-lg overflow-hidden">
+                <img
+                  src={baseURL + hotel?.imageUrl}
+                  alt="Hotel image"
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <p className="text-lg text-gray-600">{hotel?.description}</p>
+              <p className="text-lg text-gray-600">
+                <span className="font-semibold">Address: </span>
+                {hotel?.address}
+              </p>
+              <p className="text-lg text-gray-600">
+                <span className="font-semibold">Pool: </span>
                 {hotel?.hasPool ? "Has pool" : "No pool"}
               </p>
             </div>
           </div>
+
           {isAdmin && (
             <div className="flex justify-end mt-4 relative">
               <Link
@@ -104,6 +115,7 @@ const HotelPage = () => {
               </Link>
             </div>
           )}
+
           <RoomSection hotelId={hotelId} />
         </div>
       )}

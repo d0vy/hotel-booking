@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,6 +6,7 @@ import { createHotel, updateHotel } from "../api/hotelApi";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 
+// Extend the schema to include the image
 const hotelSchema = z.object({
   name: z
     .string()
@@ -22,6 +23,13 @@ const hotelSchema = z.object({
   hasPool: z.string().refine((val) => val === "true" || val === "false", {
     message: "HasPool must be specified",
   }),
+  image: z
+    .instanceof(FileList, { message: "Please upload a valid file" })
+    .refine((file) => file[0].size <= 2000000, "Max image size is 2MB.")
+    .refine(
+      (file) => ["image/png", "image/jpeg", "image/jpg"].includes(file[0].type),
+      "Only .jpg, .jpeg, and .png formats are supported."
+    ),
 });
 
 type HotelInputs = z.infer<typeof hotelSchema>;
@@ -33,6 +41,7 @@ interface HotelFormProps {
     description: string;
     address: string;
     hasPool: boolean;
+    imageUrl?: string;
   };
   onClose: () => void;
 }
@@ -45,6 +54,8 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
+    setError,
   } = useForm<HotelInputs>({
     resolver: zodResolver(hotelSchema),
     defaultValues: hotel
@@ -53,16 +64,18 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
           description: hotel.description,
           address: hotel.address,
           hasPool: hotel.hasPool ? "true" : "false",
+          image: null
         }
       : {
           name: "",
           description: "",
           address: "",
           hasPool: "true",
+          image: null,
         },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hotel) {
       setValue("name", hotel.name);
       setValue("description", hotel.description);
@@ -71,29 +84,53 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
     }
   }, [hotel, setValue]);
 
-  const onSubmit = async (data: HotelInputs) => {
-    const updatedData = {
-      ...data,
-      hasPool: data.hasPool === "true",
-    };
+  const imageFile = watch("image");
 
-    if (hotel) {
-      const response = await updateHotel(hotel.id, updatedData);
-      if (!response) {
-        toast.error("Hotel Update Failed");
+  const onSubmit = async (data: HotelInputs) => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("address", data.address);
+    formData.append("hasPool", data.hasPool);
+    formData.append("isClosed", "false");
+
+    if (imageFile) {
+      if (data.image[0]) {
+        formData.append("image", data.image[0]);
+      }
+
+      if (hotel) {
+        const response = await updateHotel(hotel.id, formData);
+        if (!response) {
+          toast.error("Hotel Update Failed");
+        } else {
+          navigate(`/hotel/${hotel.id}`);
+          toast.success("Hotel Updated Successfully");
+          onClose();
+        }
       } else {
-        navigate(`/hotel/${hotel.id}`);
-        toast.success("Hotel Updated Successfully");
-        onClose();
+        const response = await createHotel(formData);
+        if (!response) {
+          toast.error("Hotel Creation Failed");
+        } else {
+          navigate(`/hotel/${response.id}`);
+          toast.success("Hotel Created Successfully");
+          onClose();
+        }
       }
     } else {
-      const response = await createHotel(updatedData);
-      if (!response) {
-        toast.error("Hotel Creation Failed");
+      if (hotel) {
+        const response = await updateHotel(hotel.id, formData);
+        if (!response) {
+          toast.error("Hotel Update Failed");
+        } else {
+          navigate(`/hotel/${hotel.id}`);
+          toast.success("Hotel Updated Successfully");
+          onClose();
+        }
       } else {
-        navigate(`/hotel/${response.id}`);
-        toast.success("Hotel Created Successfully");
-        onClose();
+        setError("image",{message:"Please upload hotel image"})
+        toast.error("Hotel Update Failed");
       }
     }
   };
@@ -165,6 +202,29 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
             {errors.address && (
               <p className="text-red-500 text-sm mt-2">
                 {errors.address.message}
+              </p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <label
+              htmlFor="image"
+              className="block text-lg font-medium text-gray-800"
+            >
+              Upload Hotel Image
+            </label>
+            <input
+              id="image"
+              type="file"
+              accept="image/png, image/jpeg, image/jpg"
+              {...register("image")}
+              className={`w-full p-4 border-2 ${
+                errors.image ? "border-red-500" : "border-orange-500"
+              } rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all`}
+            />
+            {errors.image && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.image.message}
               </p>
             )}
           </div>

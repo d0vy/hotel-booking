@@ -7,6 +7,9 @@ using HotelBookingAPI.Data.Validation;
 using HotelBookingAPI.Endpoints;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using SharpGrip.FluentValidation.AutoValidation.Endpoints.Extensions;
 using System.Text;
@@ -21,6 +24,7 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod().
                           AllowCredentials());
 });
+
 
 builder.Services.AddDbContext<HotelDbContext>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
@@ -59,6 +63,16 @@ using var scope = app.Services.CreateScope();
 var dbSeeder = scope.ServiceProvider.GetRequiredService<AuthSeeder>();
 await dbSeeder.SeedAsync();
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+            Path.Combine(System.IO.Directory.GetCurrentDirectory(),
+    "wwwroot", "uploads")),
+    RequestPath = "/uploads"
+});
+
+
+
 app.UseCors("AllowSpecificOrigin");
 app.AddAuthEndpoints();
 
@@ -68,5 +82,4 @@ app.AddCommentEndpoints();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.Run();

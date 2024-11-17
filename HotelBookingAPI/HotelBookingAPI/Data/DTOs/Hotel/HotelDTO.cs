@@ -2,7 +2,7 @@
 
 namespace HotelBookingAPI.Data.DTOs.Hotel
 {
-    public record HotelDTO(int Id, string Name, string Description, string Address, bool HasPool, bool IsClosed)
+    public record HotelDTO(int Id, string Name, string Description, string Address, bool HasPool, bool IsClosed, string imageUrl)
     {
         public class HotelDTOValidator : AbstractValidator<HotelDTO>
         {
@@ -14,6 +14,7 @@ namespace HotelBookingAPI.Data.DTOs.Hotel
                 RuleFor(x => x.Address).NotEmpty().Length(min: 5, max: 100);
                 RuleFor(x => x.HasPool).NotNull();
                 RuleFor(x => x.IsClosed).NotNull();
+                RuleFor(x => x.imageUrl).NotNull();
             }
         }
     }

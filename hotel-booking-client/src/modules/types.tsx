@@ -5,6 +5,7 @@ export type Hotel = {
   address: string;
   hasPool: boolean;
   isClosed: boolean;
+  imageUrl: string;
 };
 
 export type CreateHotel = {
@@ -12,6 +13,7 @@ export type CreateHotel = {
   description: string;
   address: string;
   hasPool: boolean;
+  image: File;
 };
 
 export type Room = {

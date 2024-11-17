@@ -7,7 +7,7 @@ namespace HotelBookingAPI.Data.Mappers
     {
         public static HotelDTO ToHotelDTO(this Hotel hotel)
         {
-            return new HotelDTO(hotel.Id, hotel.Name, hotel.Description, hotel.Address, hotel.HasPool, hotel.IsClosed);
+            return new HotelDTO(hotel.Id, hotel.Name, hotel.Description, hotel.Address, hotel.HasPool, hotel.IsClosed, hotel.ImageUrl);
         }
     }
 }

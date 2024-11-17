@@ -2,7 +2,7 @@
 
 namespace HotelBookingAPI.Data.DTOs.Hotel
 {
-    public record CreateHotelDTO(string Name, string Description, string Address, bool HasPool)
+    public record CreateHotelDTO(string Name, string Description, string Address, bool HasPool, IFormFile Image)
     {
         public class CreateHotelDTOValidator : AbstractValidator<CreateHotelDTO>
         {

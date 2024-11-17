@@ -43,7 +43,7 @@ export const getHotel = async (id: string) => {
   }
 };
 
-export const createHotel = async (hotel: CreateHotel) => {
+export const createHotel = async (hotel: FormData) => {
   try {
     const response = await axiosInstance.post(APIHotelEndpoint, hotel);
     return response.data;
@@ -58,7 +58,7 @@ export const createHotel = async (hotel: CreateHotel) => {
   }
 };
 
-export const updateHotel = async (hotelId: string, hotel: CreateHotel) => {
+export const updateHotel = async (hotelId: string, hotel: FormData) => {
   try {
     const response = await axiosInstance.put(
       APIHotelEndpoint + `/${hotelId}`,
