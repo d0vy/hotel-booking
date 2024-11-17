@@ -32,7 +32,7 @@ public static class CommentEndpoints
                 return Results.NotFound();
             }
 
-            var comments = await dbContext.Comments.Where(comment => comment.RoomId == roomId).Select(comment => comment.ToCommentDTO()).ToListAsync();
+            var comments = await dbContext.Comments.Where(comment => comment.RoomId == roomId).Include(comment => comment.User).OrderByDescending(comment => comment.CreatedAt).Select(comment => comment.ToCommentDTO()).ToListAsync();
             return Results.Ok(comments);
         });
 
@@ -50,7 +50,7 @@ public static class CommentEndpoints
                 return Results.NotFound();
             }
 
-            var comments = await dbContext.Comments.Where(comment => comment.RoomId == roomId && comment.Id == commentId).FirstOrDefaultAsync();
+            var comments = await dbContext.Comments.Where(comment => comment.RoomId == roomId && comment.Id == commentId).Include(comment => comment.User).FirstOrDefaultAsync();
             return comments == null ? Results.NotFound() : Results.Ok(comments.ToCommentDTO());
         });
 
@@ -78,7 +78,7 @@ public static class CommentEndpoints
 
             dbContext.Comments.Add(comment);
             await dbContext.SaveChangesAsync();
-
+            dbContext.Entry(comment).Reference(c => c.User).Load();
             return Results.Created($"/api/hotels/{hotelId}/rooms/{roomId}/comments/{comment.Id}", comment.ToCommentDTO());
         });
 

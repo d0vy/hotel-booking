@@ -2,7 +2,6 @@
 using HotelBookingAPI.Auth.Model;
 using HotelBookingAPI.Auth.Services;
 using Microsoft.AspNetCore.Identity;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -15,7 +14,7 @@ namespace HotelBookingAPI.Auth
             app.MapPost("api/accounts", async (UserManager<HotelUser> userManager, RegisterUserDTO dto) =>
             {
                 var user = await userManager.FindByNameAsync(dto.UserName);
-                if(user != null)
+                if (user != null)
                 {
                     return Results.UnprocessableEntity("Username already taken");
                 }
@@ -37,16 +36,16 @@ namespace HotelBookingAPI.Auth
                 return Results.Created();
             });
 
-            app.MapPost("api/login", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext,LoginDTO dto) =>
+            app.MapPost("api/login", async (LoginDTO dto, UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext) =>
             {
                 var user = await userManager.FindByNameAsync(dto.UserName);
                 if (user == null)
                 {
-                    return Results.UnprocessableEntity("Username does not exist");
+                    return Results.UnprocessableEntity("Username or password was incorrect");
                 }
 
                 var isPasswordValid = await userManager.CheckPasswordAsync(user, dto.Password);
-                if(!isPasswordValid)
+                if (!isPasswordValid)
                 {
                     return Results.UnprocessableEntity("Username or password was incorrect");
                 }
@@ -74,31 +73,31 @@ namespace HotelBookingAPI.Auth
 
             app.MapPost("api/accessToken", async (UserManager<HotelUser> userManager, JwtTokenService jwtTokenService, SessionService sessionService, HttpContext httpContext) =>
             {
-                if(!httpContext.Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
+                if (!httpContext.Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
                 {
                     return Results.UnprocessableEntity();
                 }
 
-                if(!jwtTokenService.TryParseRefreshToken(refreshToken, out var claims))
+                if (!jwtTokenService.TryParseRefreshToken(refreshToken, out var claims))
                 {
                     return Results.UnprocessableEntity();
                 }
 
                 var sessionId = claims.FindFirstValue("SessionId");
-                if(string.IsNullOrEmpty(sessionId))
+                if (string.IsNullOrEmpty(sessionId))
                 {
                     return Results.UnprocessableEntity();
                 }
 
                 var sessionIdAsGuid = Guid.Parse(sessionId);
-                if(!await sessionService.IsSessionValidAsync(sessionIdAsGuid, refreshToken))
+                if (!await sessionService.IsSessionValidAsync(sessionIdAsGuid, refreshToken))
                 {
                     return Results.UnprocessableEntity();
                 }
 
                 var userId = claims.FindFirstValue(JwtRegisteredClaimNames.Sub);
                 var user = await userManager.FindByIdAsync(userId);
-                if(user == null)
+                if (user == null)
                 {
                     return Results.UnprocessableEntity();
                 }

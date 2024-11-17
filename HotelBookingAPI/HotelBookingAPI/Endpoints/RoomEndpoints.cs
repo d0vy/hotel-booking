@@ -23,7 +23,7 @@ public static class RoomEndpoints
                 return Results.NotFound();
             }
 
-            var rooms = await dbContext.Rooms.Where(room => room.HotelId == hotelId).Select(room => room.ToRoomDTO()).ToListAsync();
+            var rooms = await dbContext.Rooms.Where(room => room.HotelId == hotelId).OrderBy(room => room.Number).Select(room => room.ToRoomDTO()).ToListAsync();
             return Results.Ok(rooms);
         });
 
@@ -45,6 +45,12 @@ public static class RoomEndpoints
             if (hotel == null)
             {
                 return Results.NotFound();
+            }
+
+            var sameNumberRoom = await dbContext.Rooms.Where(room => room.Number == dto.Number && room.HotelId == hotelId).FirstOrDefaultAsync();
+            if (sameNumberRoom != null)
+            {
+                return Results.UnprocessableEntity("Room with provided number already exists");
             }
 
             var room = new Room

@@ -7,7 +7,7 @@ namespace HotelBookingAPI.Data.Mappers
     {
         public static CommentDTO ToCommentDTO(this Comment comment)
         {
-            return new CommentDTO(comment.Id, comment.Text, comment.CreatedAt);
+            return new CommentDTO(comment.Id, comment.Text, comment.CreatedAt, comment.User.UserName);
         }
     }
 }

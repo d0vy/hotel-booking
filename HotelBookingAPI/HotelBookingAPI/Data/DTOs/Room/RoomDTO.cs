@@ -9,8 +9,8 @@ namespace HotelBookingAPI.Data.DTOs.Room
             public RoomDTOValidator()
             {
                 RuleFor(x => x.Id).NotEmpty();
-                RuleFor(x => x.Number).NotEmpty().GreaterThan(0);
-                RuleFor(x => x.BedAmount).NotEmpty().GreaterThan(0);
+                RuleFor(x => x.Number).NotEmpty().GreaterThan(0).LessThan(10000);
+                RuleFor(x => x.BedAmount).NotEmpty().GreaterThan(0).LessThan(10000); ;
                 RuleFor(x => x.Description).NotEmpty().Length(min: 5, max: 500);
             }
         }

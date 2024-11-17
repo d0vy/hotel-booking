@@ -6,7 +6,7 @@ The purpose of this system is to let users look through, book available hotel ro
 * Look through hotels, rooms, and comments (guest, user, admin)
 * Book/unbook hotel rooms and look through the booked hotel room list (user)
 * Add, edit, and delete hotels, rooms (admin)
-* Add, edit, and delete comments on hotel rooms that are/were booked by the user. Only one comment from the user per room (user)
+* Add, edit, and delete comments on hotel rooms (user, admin)
 * Same hotel room can't be booked twice if booking periods overlap
 
 ### Technologies:
