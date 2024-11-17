@@ -7,6 +7,13 @@ export type Hotel = {
   isClosed: boolean;
 };
 
+export type CreateHotel = {
+  name: string;
+  description: string;
+  address: string;
+  hasPool: boolean;
+};
+
 export type Room = {
   id: string;
   number: number;
@@ -18,4 +25,22 @@ export type Comment = {
   id: string;
   text: string;
   createdAt: Date;
+  userName: string;
+};
+
+export type LoginUser = {
+  userName: string;
+  password: string;
+};
+
+export type User = {
+  userId: string;
+  userName: string;
+  groups: string[];
+};
+
+export type RegisterUser = {
+  userName: string;
+  email: string;
+  password: string;
 };

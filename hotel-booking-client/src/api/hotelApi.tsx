@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Hotel, Room, Comment } from "../modules/types";
+import { Hotel, Room, Comment, CreateHotel } from "../modules/types";
 import { axiosInstance } from "./axios";
 
 const APIHotelEndpoint = "/hotels";
@@ -25,6 +25,54 @@ export const getHotel = async (id: string) => {
       APIHotelEndpoint + `/${id}`
     );
     return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const createHotel = async (hotel: CreateHotel) => {
+  try {
+    const response = await axiosInstance.post(APIHotelEndpoint, hotel);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const updateHotel = async (hotelId: string, hotel: CreateHotel) => {
+  try {
+    const response = await axiosInstance.put(
+      APIHotelEndpoint + `/${hotelId}`,
+      hotel
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const deleteHotel = async (hotelId: string) => {
+  try {
+    await axiosInstance.delete(APIHotelEndpoint + `/${hotelId}`);
+    return "success";
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log(error.message);
@@ -82,6 +130,32 @@ export const getComments = async (hotelId: string, roomId: string) => {
         APIRoomEndpoint +
         `/${roomId}` +
         APICommentEndpoint
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.message);
+      return null;
+    } else {
+      console.log(error);
+      return null;
+    }
+  }
+};
+
+export const deleteComment = async (
+  hotelId: string,
+  roomId: string,
+  commentId: string
+) => {
+  try {
+    const response = await axiosInstance.delete(
+      APIHotelEndpoint +
+        `/${hotelId}` +
+        APIRoomEndpoint +
+        `/${roomId}` +
+        APICommentEndpoint +
+        `/${commentId}`
     );
     return response.data;
   } catch (error) {
