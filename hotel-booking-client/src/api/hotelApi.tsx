@@ -3,7 +3,6 @@ import {
   Hotel,
   Room,
   Comment,
-  CreateHotel,
   CreateRoom,
   CreateComment,
 } from "../modules/types";

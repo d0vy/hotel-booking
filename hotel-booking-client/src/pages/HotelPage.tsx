@@ -12,8 +12,6 @@ import { baseURL } from "../api/axios";
 import {
   FaMapMarkerAlt,
   FaSwimmingPool,
-  FaTrash,
-  FaEdit,
 } from "react-icons/fa";
 import ConfirmationModal from "../components/ConfirmationModal"; // Import the modal
 

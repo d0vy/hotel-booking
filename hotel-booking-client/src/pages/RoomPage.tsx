@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import RoomForm from "../components/RoomForm";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaBed, FaEdit, FaTrash } from "react-icons/fa";
+import { FaBed } from "react-icons/fa";
 import ConfirmationModal from "../components/ConfirmationModal";
 
 const RoomPage = () => {
