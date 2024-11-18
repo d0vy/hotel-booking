@@ -9,10 +9,13 @@ import { toast } from "react-toastify";
 import RoomForm from "../components/RoomForm";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { FaBed, FaEdit, FaTrash } from "react-icons/fa";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 const RoomPage = () => {
   const { hotelId, roomId } = useParams();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -44,11 +47,6 @@ const RoomPage = () => {
   const isAdmin = currentUser?.groups.includes("Admin");
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this room?"
-    );
-    if (!confirmDelete) return;
-
     try {
       const response = await deleteRoom(hotelId, roomId);
       if (response === "success") {
@@ -62,8 +60,16 @@ const RoomPage = () => {
     }
   };
 
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
   return (
-    <div className="container mx-auto py-12 mt-10 mx-5">
+    <div className="container mx-auto py-12 mt-10 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col space-y-4">
         <div className="flex justify-between items-center">
           <Link
@@ -76,16 +82,16 @@ const RoomPage = () => {
           {isAdmin && !isEditMode && (
             <div className="flex space-x-4 ml-auto">
               <button
-                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center space-x-2"
                 onClick={() => setIsEditMode(true)}
               >
-                Edit
+                <span>Edit</span>
               </button>
               <button
-                onClick={handleDelete}
-                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                onClick={openDeleteModal}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center space-x-2"
               >
-                Delete
+                <span>Delete</span>
               </button>
             </div>
           )}
@@ -95,19 +101,34 @@ const RoomPage = () => {
       {isEditMode ? (
         <RoomForm room={room} onClose={() => setIsEditMode(false)} />
       ) : (
-        <div className="container mx-auto mt-10">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
+        <div className="mt-8">
+          <div className="space-y-8">
+            <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
               <h2 className="text-4xl font-bold text-orange-600">
                 Room {room?.number}
               </h2>
               <p className="text-lg text-gray-600 mt-4">{room?.description}</p>
-              <p className="text-lg text-gray-600 mt-4">{room?.bedAmount}</p>
+
+              <div className="mt-6 space-y-4">
+                <p className="flex items-center text-lg text-gray-700">
+                  <FaBed className="mr-3 text-orange-500" />
+                  <span className="font-semibold mr-2">Beds: </span>{" "}
+                  {room?.bedAmount}
+                </p>
+              </div>
             </div>
           </div>
+
           <CommentSection hotelId={hotelId} roomId={roomId} />
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        message="Are you sure you want to delete this room? This action cannot be undone."
+      />
     </div>
   );
 };

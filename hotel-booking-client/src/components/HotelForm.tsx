@@ -109,6 +109,7 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
           navigate(`/hotel/${hotel.id}`);
           toast.success("Hotel Updated Successfully");
           onClose();
+          navigate(0);
         }
       } else {
         const response = await createHotel(formData);
@@ -130,6 +131,7 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
           navigate(`/hotel/${hotel.id}`);
           toast.success("Hotel Updated Successfully");
           onClose();
+          navigate(0);
         }
       } else {
         setError("image", { message: "Please upload hotel image" });
@@ -176,7 +178,7 @@ const HotelForm = ({ hotel, onClose }: HotelFormProps) => {
             <textarea
               id="description"
               {...register("description")}
-              className={`w-full p-4 border-2 ${
+              className={`w-full p-4 border-2 min-h-20 ${
                 errors.description ? "border-red-500" : "border-orange-500"
               } rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all`}
             />

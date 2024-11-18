@@ -9,11 +9,18 @@ import RoomSection from "../components/RoomSection";
 import { useAuth } from "../components/AuthProvider";
 import { toast } from "react-toastify";
 import { baseURL } from "../api/axios";
-import { FaMapMarkerAlt, FaSwimmingPool } from "react-icons/fa";
+import {
+  FaMapMarkerAlt,
+  FaSwimmingPool,
+  FaTrash,
+  FaEdit,
+} from "react-icons/fa";
+import ConfirmationModal from "../components/ConfirmationModal"; // Import the modal
 
 const HotelPage = () => {
   const { hotelId } = useParams();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for modal visibility
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -40,12 +47,8 @@ const HotelPage = () => {
 
   const isAdmin = currentUser?.groups.includes("Admin");
 
+  // Handle hotel deletion
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this hotel?"
-    );
-    if (!confirmDelete) return;
-
     try {
       const response = await deleteHotel(hotelId);
       if (response === "success") {
@@ -57,6 +60,15 @@ const HotelPage = () => {
     } catch (error) {
       toast.error("An error occurred while deleting the hotel.");
     }
+  };
+
+  // Open and close the confirmation modal
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -71,7 +83,7 @@ const HotelPage = () => {
               Edit
             </button>
             <button
-              onClick={handleDelete}
+              onClick={openDeleteModal}
               className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
             >
               Delete
@@ -130,6 +142,13 @@ const HotelPage = () => {
           <RoomSection hotelId={hotelId} />
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        message="Are you sure you want to delete this hotel? This action cannot be undone."
+      />
     </div>
   );
 };

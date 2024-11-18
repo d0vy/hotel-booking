@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CreateComment } from "../modules/types";
 import { useAuth } from "./AuthProvider";
+import ConfirmationModal from "./ConfirmationModal";
 
 const commentSchema = z.object({
   text: z
@@ -27,6 +28,8 @@ type Props = { hotelId: string; roomId: string };
 const CommentSection = ({ hotelId, roomId }: Props) => {
   const [editingIndex, setEditingIndex] = useState<null | number>(null);
   const [editedComment, setEditedComment] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const { currentUser } = useAuth();
 
   const queryClient = useQueryClient();
@@ -110,7 +113,21 @@ const CommentSection = ({ hotelId, roomId }: Props) => {
   };
 
   const handleDelete = (commentId: string) => {
-    mutationDeleteComment.mutate(commentId);
+    setCommentToDelete(commentId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (commentToDelete) {
+      mutationDeleteComment.mutate(commentToDelete);
+      setIsDeleteModalOpen(false);
+      setCommentToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setCommentToDelete(null);
   };
 
   const onSubmit = (data: { text: string }) => {
@@ -194,6 +211,13 @@ const CommentSection = ({ hotelId, roomId }: Props) => {
           })}
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        message="Are you sure you want to delete this comment? This action cannot be undone."
+      />
     </div>
   );
 };

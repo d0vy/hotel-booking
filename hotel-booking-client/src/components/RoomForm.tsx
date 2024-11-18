@@ -80,6 +80,7 @@ const RoomForm = ({ room, onClose }: RoomFormProps) => {
         navigate(`/hotel/${hotelId}/room/${room.id}`);
         toast.success("Room Updated Successfully");
         onClose();
+        navigate(0);
       }
     } else {
       const response = await createRoom(hotelId, data);
@@ -162,7 +163,7 @@ const RoomForm = ({ room, onClose }: RoomFormProps) => {
             <textarea
               id="description"
               {...register("description")}
-              className={`w-full p-4 border-2 ${
+              className={`w-full p-4 border-2 min-h-20 ${
                 errors.description ? "border-red-500" : "border-orange-500"
               } rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all`}
             />
