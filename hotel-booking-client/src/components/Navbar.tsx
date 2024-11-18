@@ -40,12 +40,6 @@ const Navbar = () => {
           >
             Home
           </Link>
-          <Link
-            to="/rooms"
-            className="text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-full text-sm font-semibold transition duration-300 border-2 border-gray-700"
-          >
-            Rooms
-          </Link>
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
@@ -86,13 +80,19 @@ const Navbar = () => {
           className="relative w-8 h-8 flex flex-col justify-center items-center space-y-1 bg-orange-500 hover:bg-orange-600 rounded-lg focus:outline-none"
         >
           <div
-            className={`w-6 h-1 bg-white transition-all duration-300 ease-in-out ${isOpen ? "rotate-45 translate-y-2" : ""}`}
+            className={`w-6 h-1 bg-white transition-all duration-300 ease-in-out ${
+              isOpen ? "rotate-45 translate-y-2" : ""
+            }`}
           ></div>
           <div
-            className={`w-6 h-1 bg-white transition-all duration-300 ease-in-out ${isOpen ? "opacity-0" : ""}`}
+            className={`w-6 h-1 bg-white transition-all duration-300 ease-in-out ${
+              isOpen ? "opacity-0" : ""
+            }`}
           ></div>
           <div
-            className={`w-6 h-1 bg-white transition-all duration-300 ease-in-out ${isOpen ? "-rotate-45 -translate-y-2" : ""}`}
+            className={`w-6 h-1 bg-white transition-all duration-300 ease-in-out ${
+              isOpen ? "-rotate-45 -translate-y-2" : ""
+            }`}
           ></div>
         </button>
       </div>
@@ -109,13 +109,6 @@ const Navbar = () => {
             onClick={toggleMenu}
           >
             Home
-          </Link>
-          <Link
-            to="/rooms"
-            className="text-white bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded-full text-center mt-4 text-sm font-semibold transition duration-300 border-2 border-gray-700"
-            onClick={toggleMenu}
-          >
-            Rooms
           </Link>
 
           {!currentUser ? (
