@@ -6,7 +6,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://api.example.com/api
+  - url: http://localhost:5125/api
 
 paths:
   /hotels:
@@ -40,7 +40,7 @@ paths:
                   isClosed: false
                   imageUrl: "localhost:8080/uploads/image2.jpg"
     post:
-      description: "Create a hotel"
+      summary: Create a hotel
       tags:
         - hotel
       operationId: createHotel
@@ -55,7 +55,7 @@ paths:
                 address: "Palangos g. 50"
                 hasPool: true
                 isClosed: false
-                imageUrl: "localhost:8080/uploads/image2.jpg"
+                image: File
       responses:
         "401":
           description: Unauthorized
@@ -148,7 +148,7 @@ paths:
                   bedAmount: 4
                   description: "Great seaside room 2"
     post:
-      description: "Add a room"
+      summary: Create a room for a specific hotel
       tags:
         - room
       operationId: createRoom
@@ -183,7 +183,7 @@ paths:
     get:
       summary: Get a specific room for a specific hotel
       tags:
-        - hotel
+        - room
       operationId: getRoom
       responses:
         "404":
@@ -543,6 +543,7 @@ components:
               address: "Palangos g. 50"
               hasPool: false
               isClosed: false
+              imageUrl: "localhost:8080/uploads/image2.jpg"
     unprocessableEntity:
       description: Unprocessable entity response
       content:
