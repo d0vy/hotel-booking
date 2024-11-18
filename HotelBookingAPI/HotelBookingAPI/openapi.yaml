@@ -31,12 +31,14 @@ paths:
                   address: "Palangos g. 50"
                   hasPool: true
                   isClosed: false
+                  imageUrl: "localhost:8080/uploads/image.jpg"
                 - id: 2
                   name: "New York old"
                   description: "Historical hotel"
                   address: "New York 50 St."
                   hasPool: false
                   isClosed: false
+                  imageUrl: "localhost:8080/uploads/image2.jpg"
     post:
       description: "Create a hotel"
       tags:
@@ -52,7 +54,11 @@ paths:
                 description: "Great seaside hotel"
                 address: "Palangos g. 50"
                 hasPool: true
+                isClosed: false
+                imageUrl: "localhost:8080/uploads/image2.jpg"
       responses:
+        "401":
+          description: Unauthorized
         "201":
           $ref: "#/components/responses/singleHotel"
         "400":
@@ -62,7 +68,7 @@ paths:
 
   /hotels/{hotelId}:
     parameters:
-      - $ref: '#/components/parameters/hotelId'
+      - $ref: "#/components/parameters/hotelId"
     get:
       summary: Get a hotel
       tags:
@@ -89,7 +95,10 @@ paths:
                 address: "Palangos g. 50"
                 hasPool: true
                 isClosed: false
+                image: File
       responses:
+        "401":
+          description: Unauthorized
         "200":
           $ref: "#/components/responses/singleHotel"
         "400":
@@ -104,104 +113,255 @@ paths:
         - hotel
       operationId: deleteHotel
       responses:
+        "401":
+          description: Unauthorized
         "404":
           $ref: "#/components/responses/notFound"
         "204":
           description: Hotel deleted
   /hotels/{hotelId}/rooms:
     parameters:
-      - $ref: '#/components/parameters/hotelId'
+      - $ref: "#/components/parameters/hotelId"
     get:
       summary: Get rooms for a specific hotel
       tags:
         - room
       operationId: getRooms
       responses:
+        "404":
+          $ref: "#/components/responses/notFound"
         "200":
           description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/room"
+              example:
+                - id: 1
+                  number: 10
+                  bedAmount: 2
+                  description: "Great seaside room 1"
+                - id: 2
+                  number: 11
+                  bedAmount: 4
+                  description: "Great seaside room 2"
     post:
-      description: 'Add a room'
+      description: "Add a room"
       tags:
         - room
       operationId: createRoom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createRoom"
       responses:
-        '201':
+        "401":
+          description: Unauthorized
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "201":
           description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/room"
+              example:
+                - id: 1
+                  number: 10
+                  bedAmount: 2
+                  description: "Great seaside room 1"
   /hotels/{hotelId}/rooms/{roomId}:
     parameters:
-      - $ref: '#/components/parameters/hotelId'
-      - $ref: '#/components/parameters/roomId'
+      - $ref: "#/components/parameters/hotelId"
+      - $ref: "#/components/parameters/roomId"
     get:
       summary: Get a specific room for a specific hotel
       tags:
         - hotel
-      operationId: getHotel
+      operationId: getRoom
       responses:
+        "404":
+          $ref: "#/components/responses/notFound"
         "200":
           description: A single room
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/room"
+              example:
+                - id: 1
+                  number: 10
+                  bedAmount: 2
+                  description: "Great seaside room 1"
     put:
       summary: Update a room for a specific hotel
       tags:
         - room
       operationId: updateRoom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateRoom"
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          $ref: "#/components/responses/notFound"
         "200":
           description: Updated room
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/room"
+              example:
+                - id: 1
+                  number: 10
+                  bedAmount: 2
+                  description: "Great seaside room 1"
+
     delete:
       summary: Delete a room for a specific hotel
       tags:
         - room
       operationId: deleteRoom
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          $ref: "#/components/responses/notFound"
         "204":
           description: Room deleted
   /hotels/{hotelId}/rooms/{roomId}/comments:
     parameters:
-      - $ref: '#/components/parameters/hotelId'
-      - $ref: '#/components/parameters/roomId'
+      - $ref: "#/components/parameters/hotelId"
+      - $ref: "#/components/parameters/roomId"
     get:
       summary: Get comments for a specific room
       tags:
         - comment
       operationId: getComments
       responses:
+        "404":
+          $ref: "#/components/responses/notFound"
         "200":
           description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/comment"
+              example:
+                - id: 1
+                  text: "Good comment"
+                  createdAt: "2020/11/18"
+                  userName: "admin"
+                - id: 2
+                  text: "Bad comment"
+                  createdAt: "2020/11/18"
+                  userName: "dovydas"
     post:
       summary: Add a comment for a specific room
       tags:
         - comment
       operationId: createComment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createComment"
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          $ref: "#/components/responses/notFound"
         "201":
           description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/comment"
+              example:
+                - id: 1
+                  text: "Good comment"
+                  createdAt: "2020/11/18"
+                  userName: "admin"
   /hotels/{hotelId}/rooms/{roomId}/comments/{commentId}:
     parameters:
-      - $ref: '#/components/parameters/hotelId'
-      - $ref: '#/components/parameters/roomId'
-      - $ref: '#/components/parameters/commentId'
+      - $ref: "#/components/parameters/hotelId"
+      - $ref: "#/components/parameters/roomId"
+      - $ref: "#/components/parameters/commentId"
     get:
       summary: Get a specific comment for a specific room
       tags:
         - comment
       operationId: getComment
       responses:
+        "404":
+          $ref: "#/components/responses/notFound"
         "200":
           description: A single comment
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/comment"
+              example:
+                - id: 1
+                  text: "Good comment"
+                  createdAt: "2020/11/18"
+                  userName: "admin"
     put:
       summary: Update a comment for a specific room
       tags:
         - comment
       operationId: updateComment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateComment"
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          $ref: "#/components/responses/notFound"
         "200":
           description: Updated comment
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/comment"
+              example:
+                - id: 1
+                  text: "Good comment"
+                  createdAt: "2020/11/18"
+                  userName: "admin"
     delete:
       summary: Delete a comment for a specific room
       tags:
         - comment
       operationId: deleteComment
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          $ref: "#/components/responses/notFound"
         "204":
           description: Comment deleted
 components:
@@ -225,11 +385,10 @@ components:
           type: string
         hasPool:
           type: boolean
-        addedAt:
-          type: string
-          format: date-time
         isClosed:
           type: boolean
+        imageUrl:
+          type: string
     createHotel:
       type: object
       required:
@@ -237,6 +396,8 @@ components:
         - description
         - address
         - hasPool
+        - isClosed
+        - image
       properties:
         name:
           minLength: 2
@@ -252,6 +413,10 @@ components:
           type: string
         hasPool:
           type: boolean
+        isClosed:
+          type: boolean
+        image:
+          type: object
     updateHotel:
       type: object
       properties:
@@ -271,11 +436,39 @@ components:
           type: boolean
         isClosed:
           type: boolean
+        image:
+          type: object
     room:
       type: object
       properties:
         id:
           type: integer
+        number:
+          type: integer
+        bedAmount:
+          type: integer
+        description:
+          minLength: 5
+          maxLength: 500
+          type: string
+    createRoom:
+      type: object
+      required:
+        - number
+        - bedAmount
+        - description
+      properties:
+        number:
+          type: integer
+        bedAmount:
+          type: integer
+        description:
+          minLength: 5
+          maxLength: 500
+          type: string
+    updateRoom:
+      type: object
+      properties:
         number:
           type: integer
         bedAmount:
@@ -292,6 +485,24 @@ components:
         createdAt:
           type: string
           format: date-time
+        userName:
+          type: string
+    createComment:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 2
+          maxLength: 100
+    updateComment:
+      type: object
+      properties:
+        text:
+          type: string
+          minLength: 2
+          maxLength: 100
     problemDetails:
       type: object
       properties:
@@ -376,7 +587,7 @@ components:
         type: integer
         minimum: 1
       description: The unique identifier of the comment
-  
+
 tags:
   - name: hotel
     description: Operations related to hotels
