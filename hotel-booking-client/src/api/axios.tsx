@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export const baseURL = "http://localhost:5125";
+export const baseURL = "https://hotelbookingapi2024.azurewebsites.net/"; //change to localhost
 
-const baseURL_API = "http://localhost:5125/api";
+const baseURL_API = baseURL + "/api";
 
 export const axiosInstance = axios.create({
   baseURL: baseURL_API,
